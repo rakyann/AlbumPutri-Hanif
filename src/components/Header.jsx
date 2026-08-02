@@ -91,7 +91,7 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
         </button>
       </div>
 
-      {/* Editorial Vertical Line & Couple Information Card */}
+      {/* Editorial Quote & Matching Card Grid */}
       <div className="px-6 py-8 flex flex-col items-center text-center">
         <div className="editorial-line-v" />
 
@@ -103,66 +103,63 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
           DOCUMENTING OUR WEDDING STORY
         </p>
 
-        {/* Wedding Couple Details Box */}
-        <div className="w-full max-w-2xl mt-8 p-6 sm:p-8 bg-[#121212] border border-white/10 rounded-3xl text-left shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+        {/* 2 Matching Bride & Groom Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full max-w-xl mt-6">
+          {/* Mempelai Pria Card */}
+          <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all flex flex-col justify-between">
             <div>
-              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold block">THE BRIDE & GROOM</span>
-              <h3 className="font-editorial text-xl sm:text-2xl text-white font-semibold mt-0.5">Data Mempelai</h3>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-400/90 font-mono">MEMPELAI PRIA</span>
+                <span className="text-[10px] font-mono text-stone-400">8 AGUSTUS 2026</span>
+              </div>
+              <h3 className="text-base sm:text-lg text-white font-semibold mt-2 font-editorial leading-tight">
+                {groom.fullname}
+              </h3>
+              <p className="text-xs text-stone-400 font-medium">({groom.nickname})</p>
+
+              <div className="mt-4 space-y-1.5 text-xs text-stone-300 border-t border-white/5 pt-3">
+                <p><span className="text-stone-400">Bapak:</span> {groom.father}</p>
+                <p><span className="text-stone-400">Ibu:</span> {groom.mother}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-xs text-amber-300/80 bg-amber-400/10 px-3 py-1.5 rounded-full border border-amber-400/20">
-              <Heart className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span className="font-mono text-[11px]">8 Agustus 2026</span>
+
+            <div className="mt-4 pt-3 border-t border-white/5 space-y-1.5 text-xs text-stone-400">
+              <p className="flex items-start gap-1.5 text-[11px]">
+                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                <span>{groom.address}</span>
+              </p>
+              {groom.instagram && (
+                <p className="flex items-center gap-1.5 text-amber-300/90 font-mono text-[11px]">
+                  <Instagram className="w-3.5 h-3.5 shrink-0 text-amber-400/90" />
+                  <span>{groom.instagram}</span>
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Mempelai Pria */}
-            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-              <span className="text-[10px] uppercase tracking-widest text-amber-400/90 font-mono font-bold">MEMPELAI PRIA</span>
-              <h4 className="text-lg text-white font-semibold mt-1 font-editorial">{groom.fullname}</h4>
-              <p className="text-xs text-stone-300 mt-0.5 font-medium">({groom.nickname})</p>
+          {/* Mempelai Wanita Card */}
+          <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-400/90 font-mono">MEMPELAI WANITA</span>
+                <span className="text-[10px] font-mono text-stone-400">8 AGUSTUS 2026</span>
+              </div>
+              <h3 className="text-base sm:text-lg text-white font-semibold mt-2 font-editorial leading-tight">
+                {bride.fullname}
+              </h3>
+              <p className="text-xs text-stone-400 font-medium">({bride.nickname})</p>
 
-              <div className="mt-4 space-y-2 text-xs text-stone-400 border-t border-white/5 pt-3">
-                <p>
-                  <strong className="text-stone-300">Bapak:</strong> {groom.father}
-                </p>
-                <p>
-                  <strong className="text-stone-300">Ibu:</strong> {groom.mother}
-                </p>
-                <p className="flex items-start gap-1.5 mt-2">
-                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
-                  <span>{groom.address}</span>
-                </p>
-                {groom.instagram && (
-                  <p className="flex items-center gap-1.5 text-amber-300/90 font-mono text-[11px] mt-1">
-                    <Instagram className="w-3.5 h-3.5 shrink-0" />
-                    <span>{groom.instagram}</span>
-                  </p>
-                )}
+              <div className="mt-4 space-y-1.5 text-xs text-stone-300 border-t border-white/5 pt-3">
+                <p><span className="text-stone-400">Bapak:</span> {bride.father}</p>
+                <p><span className="text-stone-400">Ibu:</span> {bride.mother}</p>
               </div>
             </div>
 
-            {/* Mempelai Wanita */}
-            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-              <span className="text-[10px] uppercase tracking-widest text-amber-400/90 font-mono font-bold">MEMPELAI WANITA</span>
-              <h4 className="text-lg text-white font-semibold mt-1 font-editorial">{bride.fullname}</h4>
-              <p className="text-xs text-stone-300 mt-0.5 font-medium">({bride.nickname})</p>
-
-              <div className="mt-4 space-y-2 text-xs text-stone-400 border-t border-white/5 pt-3">
-                <p>
-                  <strong className="text-stone-300">Bapak:</strong> {bride.father}
-                </p>
-                <p>
-                  <strong className="text-stone-300">Ibu:</strong> {bride.mother}
-                </p>
-                <p className="flex items-start gap-1.5 mt-2">
-                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
-                  <span>{bride.address}</span>
-                </p>
-              </div>
+            <div className="mt-4 pt-3 border-t border-white/5 space-y-1.5 text-xs text-stone-400">
+              <p className="flex items-start gap-1.5 text-[11px]">
+                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                <span>{bride.address}</span>
+              </p>
             </div>
           </div>
         </div>
