@@ -42,48 +42,7 @@ export function getEventFromUrl() {
   };
 }
 
-export const INITIAL_PHOTOS = [
-  {
-    id: "photo_1",
-    eventId: "default",
-    guestName: "Aditya & Sarah",
-    wish: "Selamat menempuh hidup baru drg. Hanif & drg. Putri! Semoga bahagia selalu dan dilimpahi berkah! ✨💍",
-    imageUrl: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
-    presetId: "portra400",
-    likes: 0,
-    timestamp: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: "photo_2",
-    eventId: "default",
-    guestName: "Bimantoro",
-    wish: "Happy wedding bro Hanif & Putri! Happy long life together! 🥂🔥",
-    imageUrl: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80",
-    presetId: "cinestill800t",
-    likes: 0,
-    timestamp: new Date(Date.now() - 3600000 * 4).toISOString()
-  },
-  {
-    id: "photo_3",
-    eventId: "default",
-    guestName: "Dion & Maya",
-    wish: "Momen akadnya sakral banget, selamat ya Putri & Hanif! 🎉❤️",
-    imageUrl: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80",
-    presetId: "fujisuperia",
-    likes: 0,
-    timestamp: new Date(Date.now() - 3600000 * 6).toISOString()
-  },
-  {
-    id: "photo_4",
-    eventId: "default",
-    guestName: "Fitri & Gading",
-    wish: "Cantik dan ganteng banget berdua! Wishing you endless love! 💐",
-    imageUrl: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80",
-    presetId: "bwmono",
-    likes: 0,
-    timestamp: new Date(Date.now() - 3600000 * 8).toISOString()
-  }
-];
+export const INITIAL_PHOTOS = [];
 
 const STORAGE_KEYS = {
   EVENT: "tuaipandang_event_data_",
@@ -97,11 +56,15 @@ export function getStoredEvent() {
 
 export function getStoredPhotos(eventId = "default") {
   const data = localStorage.getItem(STORAGE_KEYS.PHOTOS + eventId);
-  return data ? JSON.parse(data) : INITIAL_PHOTOS;
+  return data ? JSON.parse(data) : [];
 }
 
 export function saveStoredPhotos(photosArray, eventId = "default") {
   localStorage.setItem(STORAGE_KEYS.PHOTOS + eventId, JSON.stringify(photosArray));
+}
+
+export function clearAllPhotos(eventId = "default") {
+  localStorage.removeItem(STORAGE_KEYS.PHOTOS + eventId);
 }
 
 export function getRemainingRolls(eventId = "default", maxShots = 10) {

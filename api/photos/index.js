@@ -2,6 +2,9 @@ if (!global._tuaipandangPhotos) {
   global._tuaipandangPhotos = {};
 }
 
+// Reset any test photos
+global._tuaipandangPhotos['putri-hanif'] = [];
+
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -22,10 +25,18 @@ export default async function handler(req, res) {
     });
   }
 
+  if (req.method === 'DELETE') {
+    global._tuaipandangPhotos[eventId] = [];
+    return sendJson(200, {
+      success: true,
+      message: 'Semua foto uji coba berhasil dihapus'
+    });
+  }
+
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      if (!body || !body.imageUrl) {
+      if (!body || (!body.imageUrl && !body.url)) {
         return sendJson(400, { error: 'Missing photo payload' });
       }
 
@@ -36,9 +47,9 @@ export default async function handler(req, res) {
       const newPhoto = {
         id: body.id || `photo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         eventId: eventId,
-        guestName: body.guestName || 'Tamu Acara',
-        wish: body.wish || '',
-        imageUrl: body.imageUrl,
+        guestName: body.guestName || body.guestSessionId || 'Tamu Acara',
+        wish: body.wish || body.caption || '',
+        imageUrl: body.imageUrl || body.url,
         driveFileId: body.driveFileId || null,
         presetId: body.presetId || 'portra400',
         likes: body.likes || 0,
