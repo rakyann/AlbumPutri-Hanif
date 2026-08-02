@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #0a0a0a;
+    color: #f4f4f5;
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Calligraphy & Editorial Typography */
+.font-calligraphy {
+  font-family: 'Pinyon Script', 'Alex Brush', cursive;
+}
+
+.font-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.tracking-editorial {
+  letter-spacing: 0.25em;
+}
+
+/* App Outer Shell Container (Editorial 960px Width) */
+.editorial-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Vertical Line Divider */
+.editorial-line-v {
+  width: 1px;
+  height: 4rem;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4), transparent);
+  margin: 2rem auto;
+}
+
+/* Editorial Outline Pill Button */
+.btn-editorial-pill {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9999px;
+  padding: 0.75rem 2rem;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  color: #ffffff;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-editorial-pill:hover {
+  background: #ffffff;
+  color: #0a0a0a;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-editorial-pill:active {
+  transform: translateY(0);
+}
+
+/* LED Digital Segment Counter */
+.led-counter-screen {
+  font-family: 'Share Tech Mono', monospace;
+  background: #000;
+  color: #ff3b30;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 59, 48, 0.4);
+}
+
+/* Modal Backdrop */
+.modal-backdrop-editorial {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* Ticker Marquee Bar */
+.marquee-bar {
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}

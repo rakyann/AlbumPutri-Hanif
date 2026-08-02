@@ -1,0 +1,206 @@
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import Gallery from './components/Gallery';
+import DisposableCameraModal from './components/DisposableCameraModal';
+import UploadModal from './components/UploadModal';
+import PhotoLightbox from './components/PhotoLightbox';
+import QRCodeModal from './components/QRCodeModal';
+import LiveSlideshow from './components/LiveSlideshow';
+
+import {
+  getStoredEvent,
+  getStoredPhotos,
+  saveStoredPhotos,
+  getRemainingRolls,
+  decrementRolls
+} from './utils/storage';
+
+import JSZip from 'jszip';
+
+export default function App() {
+  const [event, setEvent] = useState(getStoredEvent());
+  const [photos, setPhotos] = useState([]);
+  const [remainingRolls, setRemainingRolls] = useState(10);
+
+  // Modals
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isQROpen, setIsQROpen] = useState(false);
+  const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
+
+  // Temporary holding data
+  const [tempCapturedData, setTempCapturedData] = useState(null);
+
+  // Lightbox
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+  useEffect(() => {
+    const currentEvent = getStoredEvent();
+    setEvent(currentEvent);
+    setPhotos(getStoredPhotos(currentEvent.id));
+    setRemainingRolls(getRemainingRolls(currentEvent.id, currentEvent.maxShotsPerGuest));
+
+    const handlePopState = () => {
+      const ev = getStoredEvent();
+      setEvent(ev);
+      setPhotos(getStoredPhotos(ev.id));
+      setRemainingRolls(getRemainingRolls(ev.id, ev.maxShotsPerGuest));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handlePhotoCaptured = (processedUrl, presetId) => {
+    setTempCapturedData({
+      url: processedUrl,
+      presetId: presetId
+    });
+    setIsUploadOpen(true);
+  };
+
+  const handleSubmitPhoto = (newPhotoData) => {
+    const newRolls = decrementRolls(event.id);
+    setRemainingRolls(newRolls);
+
+    const newPhoto = {
+      id: `photo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      eventId: event.id,
+      guestName: newPhotoData.guestName,
+      wish: newPhotoData.wish,
+      imageUrl: newPhotoData.imageUrl,
+      driveFileId: newPhotoData.driveFileId || null,
+      presetId: newPhotoData.presetId,
+      likes: 0,
+      timestamp: new Date().toISOString()
+    };
+
+    const updated = [newPhoto, ...photos];
+    setPhotos(updated);
+    saveStoredPhotos(updated, event.id);
+    setTempCapturedData(null);
+  };
+
+  const handleLikePhoto = (photoId) => {
+    const updated = photos.map((p) => {
+      if (p.id === photoId) {
+        return { ...p, likes: (p.likes || 0) + 1 };
+      }
+      return p;
+    });
+    setPhotos(updated);
+    saveStoredPhotos(updated, event.id);
+    
+    if (selectedPhoto && selectedPhoto.id === photoId) {
+      setSelectedPhoto(prev => ({ ...prev, likes: (prev.likes || 0) + 1 }));
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    if (photos.length === 0) {
+      alert("Belum ada foto dalam album untuk diunduh!");
+      return;
+    }
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder(`tuaipandang_${event.title.replace(/\s+/g, '_')}`);
+
+      photos.forEach((photo, idx) => {
+        let base64Data = photo.imageUrl;
+        if (base64Data.startsWith('data:image')) {
+          base64Data = base64Data.split(',')[1];
+        }
+        const filename = `${idx + 1}_${photo.guestName.replace(/\s+/g, '_')}_${photo.id}.jpg`;
+        folder.file(filename, base64Data, { base64: true });
+      });
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `tuaipandang_Album_${event.title.replace(/\s+/g, '_')}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Zip error:", err);
+      alert("Terjadi kesalahan saat mengompres album.");
+    }
+  };
+
+  return (
+    <div className="relative min-h-screen bg-[#0a0a0a] text-gray-100 flex flex-col items-center">
+      {/* Editorial Outer Container Shell */}
+      <div className="editorial-container">
+        {/* Header Banner */}
+        <Header
+          event={event}
+          photoCount={photos.length}
+          onOpenCamera={() => setIsCameraOpen(true)}
+          onOpenQR={() => setIsQROpen(true)}
+          onOpenSlideshow={() => setIsSlideshowOpen(true)}
+          onDownloadAll={handleDownloadAll}
+        />
+
+        {/* Collective Photo Gallery */}
+        <main className="flex-1">
+          <Gallery
+            photos={photos}
+            onSelectPhoto={(photo) => setSelectedPhoto(photo)}
+            onLikePhoto={handleLikePhoto}
+          />
+        </main>
+
+        {/* Editorial Footer */}
+        <footer className="p-8 text-center text-xs text-stone-400 border-t border-white/10 mt-8 space-y-2">
+          <p className="font-calligraphy text-2xl text-white">
+            {event.hostName}
+          </p>
+          <p className="text-[10px] uppercase tracking-editorial font-semibold">
+            {event.title} • {event.date}
+          </p>
+          <p className="text-[9px] text-stone-300 tracking-widest uppercase">
+            POWERED BY TUAIPANDANG DIGITAL DISPOSABLE CAMERA
+          </p>
+        </footer>
+      </div>
+
+      {/* Modals */}
+      <DisposableCameraModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        remainingRolls={remainingRolls}
+        event={event}
+        onPhotoCaptured={handlePhotoCaptured}
+      />
+
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        photoUrl={tempCapturedData?.url}
+        presetId={tempCapturedData?.presetId}
+        eventId={event.id}
+        onSubmitPhoto={handleSubmitPhoto}
+      />
+
+      <PhotoLightbox
+        photo={selectedPhoto}
+        onClose={() => setSelectedPhoto(null)}
+        onLikePhoto={handleLikePhoto}
+      />
+
+      <QRCodeModal
+        isOpen={isQROpen}
+        onClose={() => setIsQROpen(false)}
+        event={event}
+      />
+
+      <LiveSlideshow
+        isOpen={isSlideshowOpen}
+        onClose={() => setIsSlideshowOpen(false)}
+        photos={photos}
+        event={event}
+      />
+    </div>
+  );
+}
