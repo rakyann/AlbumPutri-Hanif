@@ -2,14 +2,39 @@ import 'dotenv/config';
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
+  // Helper functions compatible with both Node HTTP ServerResponse & Express/Vercel
+  const sendJson = (statusCode, data) => {
+    if (typeof res.status === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(data));
+  };
+
+  const sendRedirect = (redirectUrl) => {
+    if (typeof res.redirect === 'function') {
+      return res.redirect(redirectUrl);
+    }
+    res.statusCode = 302;
+    res.setHeader('Location', redirectUrl);
+    res.end();
+  };
+
+  const sendHtml = (statusCode, htmlContent) => {
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(htmlContent);
+  };
+
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
-    return res.status(500).json({ error: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are missing.' });
+    return sendJson(500, { error: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are missing in .env.' });
   }
 
-  const host = req.headers.host || 'localhost:3000';
+  const host = (req.headers && req.headers.host) || 'localhost:3000';
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const redirectUri = `${protocol}://${host}/api/auth/google`;
 
@@ -19,7 +44,7 @@ export default async function handler(req, res) {
     redirectUri
   );
 
-  const { code } = req.query;
+  const code = (req.query && req.query.code) || null;
 
   // Step 1: If no code, redirect to Google Login
   if (!code) {
@@ -28,7 +53,7 @@ export default async function handler(req, res) {
       prompt: 'consent',
       scope: ['https://www.googleapis.com/auth/drive.file']
     });
-    return res.redirect(authUrl);
+    return sendRedirect(authUrl);
   }
 
   // Step 2: Exchange code for Refresh Token
@@ -36,8 +61,7 @@ export default async function handler(req, res) {
     const { tokens } = await oauth2Client.getToken(code);
     const refreshToken = tokens.refresh_token;
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(`
+    const html = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -53,13 +77,15 @@ export default async function handler(req, res) {
           <div class="box">
             <h2>✅ GOOGLE DRIVE BERHASIL DIHUBUNGKAN!</h2>
             <p>Salin REFRESH TOKEN di bawah ini ke <b>GOOGLE_REFRESH_TOKEN</b> di <b>.env</b> & <b>Vercel Settings</b>:</p>
-            <div class="token">${refreshToken || 'Token sudah ada'}</div>
+            <div class="token">${refreshToken || 'Token sudah ada / silakan ulangi koneksi'}</div>
             <a href="/" class="btn">KEMBALI KE APLIKASI</a>
           </div>
         </body>
       </html>
-    `);
+    `;
+
+    return sendHtml(200, html);
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to exchange token', details: err.message });
+    return sendJson(500, { error: 'Failed to exchange token', details: err.message });
   }
 }

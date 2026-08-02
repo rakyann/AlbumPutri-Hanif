@@ -1,15 +1,22 @@
-// Shared Serverless Photo Memory & Storage Store for tuaipandang
-
 if (!global._tuaipandangPhotos) {
   global._tuaipandangPhotos = {};
 }
 
 export default async function handler(req, res) {
-  const eventId = req.query.eventId || 'putri-hanif';
+  const sendJson = (statusCode, data) => {
+    if (typeof res.status === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(data));
+  };
+
+  const eventId = (req.query && req.query.eventId) || 'putri-hanif';
 
   if (req.method === 'GET') {
     const list = global._tuaipandangPhotos[eventId] || [];
-    return res.status(200).json({
+    return sendJson(200, {
       success: true,
       photos: list
     });
@@ -19,7 +26,7 @@ export default async function handler(req, res) {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
       if (!body || !body.imageUrl) {
-        return res.status(400).json({ error: 'Missing photo payload' });
+        return sendJson(400, { error: 'Missing photo payload' });
       }
 
       if (!global._tuaipandangPhotos[eventId]) {
@@ -38,18 +45,17 @@ export default async function handler(req, res) {
         timestamp: body.timestamp || new Date().toISOString()
       };
 
-      // Unshift to top of shared list
       global._tuaipandangPhotos[eventId].unshift(newPhoto);
 
-      return res.status(200).json({
+      return sendJson(200, {
         success: true,
         photo: newPhoto,
         photos: global._tuaipandangPhotos[eventId]
       });
     } catch (err) {
-      return res.status(500).json({ error: err.message });
+      return sendJson(500, { error: err.message });
     }
   }
 
-  return res.status(405).json({ error: 'Method Not Allowed' });
+  return sendJson(405, { error: 'Method Not Allowed' });
 }

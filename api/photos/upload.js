@@ -14,8 +14,17 @@ if (!global._tuaipandangPhotos) {
 }
 
 export default async function handler(req, res) {
+  const sendJson = (statusCode, data) => {
+    if (typeof res.status === 'function') {
+      return res.status(statusCode).json(data);
+    }
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(data));
+  };
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+    return sendJson(405, { error: 'Method Not Allowed. Use POST.' });
   }
 
   try {
@@ -38,7 +47,7 @@ export default async function handler(req, res) {
     const caption = Array.isArray(fields.caption) ? fields.caption[0] : (fields.caption || '');
 
     if (!file) {
-      return res.status(400).json({ error: 'No file uploaded under form field "file".' });
+      return sendJson(400, { error: 'No file uploaded under form field "file".' });
     }
 
     let publicUrl = null;
@@ -49,15 +58,7 @@ export default async function handler(req, res) {
     const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
     const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
-    // Log diagnostic warning if env variables are missing
-    if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN || !FOLDER_ID) {
-      console.warn("⚠️ Google Drive credentials missing in .env or Vercel environment variables!");
-      console.warn(`GOOGLE_CLIENT_ID: ${CLIENT_ID ? 'OK' : 'MISSING'}`);
-      console.warn(`GOOGLE_CLIENT_SECRET: ${CLIENT_SECRET ? 'OK' : 'MISSING'}`);
-      console.warn(`GOOGLE_REFRESH_TOKEN: ${REFRESH_TOKEN ? 'OK' : 'MISSING'}`);
-      console.warn(`GOOGLE_DRIVE_FOLDER_ID: ${FOLDER_ID ? 'OK' : 'MISSING'}`);
-    } else {
-      // Upload to Google Drive
+    if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN && FOLDER_ID) {
       try {
         const oauth2Client = new google.auth.OAuth2(
           CLIENT_ID,
@@ -94,13 +95,11 @@ export default async function handler(req, res) {
         } catch (e) {}
 
         publicUrl = `https://lh3.googleusercontent.com/d/${driveFileId}`;
-        console.log(`✅ Successfully uploaded photo to Google Drive! File ID: ${driveFileId}`);
       } catch (driveErr) {
-        console.error("❌ Google Drive API Upload Error:", driveErr.message);
+        console.error("Google Drive API Upload Error:", driveErr.message);
       }
     }
 
-    // Save photo record to shared global list
     if (!global._tuaipandangPhotos[eventId]) {
       global._tuaipandangPhotos[eventId] = [];
     }
@@ -121,7 +120,7 @@ export default async function handler(req, res) {
       global._tuaipandangPhotos[eventId].unshift(newPhotoRecord);
     }
 
-    return res.status(200).json({
+    return sendJson(200, {
       success: true,
       driveFileId: driveFileId,
       url: publicUrl,
@@ -131,7 +130,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Upload Error:', error);
-    return res.status(500).json({
+    return sendJson(500, {
       error: 'Failed to upload photo.',
       details: error.message
     });
