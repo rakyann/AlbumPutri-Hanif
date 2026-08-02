@@ -88,7 +88,6 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
 
     playShutterSound();
 
-    // Trigger Screen Flash Burst Effect regardless of device torch support
     setIsFlashing(true);
     setTimeout(() => setIsFlashing(false), 400);
 
@@ -166,6 +165,37 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
 
   const currentPresetObj = FILM_PRESETS.find(p => p.id === selectedPreset) || FILM_PRESETS[0];
 
+  // Define live overlay styles for iOS Safari & Android mobile compatibility
+  const livePresetOverlayStyles = {
+    portra400: {
+      backdropFilter: 'contrast(108%) saturate(115%) sepia(20%)',
+      backgroundColor: 'rgba(255, 215, 170, 0.14)',
+      mixBlendMode: 'color'
+    },
+    cinestill800t: {
+      backdropFilter: 'contrast(115%) saturate(125%) hue-rotate(-15deg)',
+      backgroundColor: 'rgba(0, 190, 225, 0.12)',
+      mixBlendMode: 'overlay'
+    },
+    fujisuperia: {
+      backdropFilter: 'contrast(112%) saturate(130%) hue-rotate(10deg)',
+      backgroundColor: 'rgba(160, 245, 185, 0.10)',
+      mixBlendMode: 'color'
+    },
+    bwmono: {
+      backdropFilter: 'grayscale(100%) contrast(130%)',
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+      mixBlendMode: 'normal'
+    },
+    clean: {
+      backdropFilter: 'none',
+      backgroundColor: 'transparent',
+      mixBlendMode: 'normal'
+    }
+  };
+
+  const activeLiveStyle = livePresetOverlayStyles[selectedPreset] || livePresetOverlayStyles.portra400;
+
   return (
     <div className="modal-backdrop-editorial z-50">
       {/* Bright Screen Flash Overlay */}
@@ -206,18 +236,31 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
               </button>
             </div>
           ) : (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className={`w-full h-full object-cover transition-all ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-              style={{ filter: currentPresetObj.cssFilter }}
-            />
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full h-full object-cover transition-all ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                style={{ filter: currentPresetObj.cssFilter }}
+              />
+
+              {/* Real-time Live Filter Viewfinder Overlay Layer (Works 100% on Mobile Safari & Android) */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-all duration-300"
+                style={{
+                  backdropFilter: activeLiveStyle.backdropFilter,
+                  WebkitBackdropFilter: activeLiveStyle.backdropFilter,
+                  backgroundColor: activeLiveStyle.backgroundColor,
+                  mixBlendMode: activeLiveStyle.mixBlendMode
+                }}
+              />
+            </>
           )}
 
           {/* Viewfinder Grid Target */}
-          <div className="absolute inset-0 pointer-events-none opacity-25 border border-white/20 flex items-center justify-center">
+          <div className="absolute inset-0 pointer-events-none opacity-25 border border-white/20 flex items-center justify-center z-10">
             <div className="w-full h-[1px] bg-white/40" />
             <div className="h-full w-[1px] bg-white/40 absolute" />
             <div className="w-16 h-16 border border-white/60 rounded-full" />
@@ -225,7 +268,7 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
 
           {/* Optional Frame Preview Badge if enabled */}
           {showFrame && (
-            <div className="absolute bottom-3 left-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 flex justify-between items-center text-[10px] text-stone-300">
+            <div className="absolute bottom-3 left-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 flex justify-between items-center text-[10px] text-stone-300 z-10">
               <span className="font-semibold truncate">{event.frameText}</span>
               <span className="font-mono text-[8px] uppercase tracking-widest text-stone-400">TUAIPANDANG FRAME</span>
             </div>
