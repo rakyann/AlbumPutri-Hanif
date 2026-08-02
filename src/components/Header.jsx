@@ -1,24 +1,7 @@
 import React from 'react';
-import { Camera, QrCode, Tv, Download, Heart, MapPin, Instagram } from 'lucide-react';
+import { Camera, QrCode, Tv, Download } from 'lucide-react';
 
 export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOpenSlideshow, onDownloadAll }) {
-  const groom = event.groom || {
-    nickname: "Hanif",
-    fullname: "drg. Moh. Irsyad Hanif, M.H",
-    father: "drg. Moh Baehaqi, M.M, M.Pd (Alm)",
-    mother: "Dr. Apt. Muslimah, S.Si, M.M, M.Pd",
-    address: "Jl. Raya Bandungrejo No.48 Mranggen, Demak",
-    instagram: "@hanifirsyad3"
-  };
-
-  const bride = event.bride || {
-    nickname: "Putri",
-    fullname: "drg. Putri Nur Azizah Zakiyah",
-    father: "Aris Budiman, S.Pd, M.Pd",
-    mother: "Tri Ungsi Rahayu, S.Pd",
-    address: "Jl. Beringin III No.16A RT.01/RW.04, Perumahan Bojong, Purbalingga"
-  };
-
   return (
     <header className="relative w-full text-center">
       {/* Top Banner Marquee */}
@@ -91,7 +74,7 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
         </button>
       </div>
 
-      {/* Editorial Quote & Matching Card Grid */}
+      {/* Editorial Quote & Clean Actions */}
       <div className="px-6 py-8 flex flex-col items-center text-center">
         <div className="editorial-line-v" />
 
@@ -103,68 +86,7 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
           DOCUMENTING OUR WEDDING STORY
         </p>
 
-        {/* 2 Matching Bride & Groom Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 w-full max-w-xl mt-6">
-          {/* Mempelai Pria Card */}
-          <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-400/90 font-mono">MEMPELAI PRIA</span>
-                <span className="text-[10px] font-mono text-stone-400">8 AGUSTUS 2026</span>
-              </div>
-              <h3 className="text-base sm:text-lg text-white font-semibold mt-2 font-editorial leading-tight">
-                {groom.fullname}
-              </h3>
-              <p className="text-xs text-stone-400 font-medium">({groom.nickname})</p>
-
-              <div className="mt-4 space-y-1.5 text-xs text-stone-300 border-t border-white/5 pt-3">
-                <p><span className="text-stone-400">Bapak:</span> {groom.father}</p>
-                <p><span className="text-stone-400">Ibu:</span> {groom.mother}</p>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-white/5 space-y-1.5 text-xs text-stone-400">
-              <p className="flex items-start gap-1.5 text-[11px]">
-                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
-                <span>{groom.address}</span>
-              </p>
-              {groom.instagram && (
-                <p className="flex items-center gap-1.5 text-amber-300/90 font-mono text-[11px]">
-                  <Instagram className="w-3.5 h-3.5 shrink-0 text-amber-400/90" />
-                  <span>{groom.instagram}</span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Mempelai Wanita Card */}
-          <div className="p-5 bg-white/[0.03] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-400/90 font-mono">MEMPELAI WANITA</span>
-                <span className="text-[10px] font-mono text-stone-400">8 AGUSTUS 2026</span>
-              </div>
-              <h3 className="text-base sm:text-lg text-white font-semibold mt-2 font-editorial leading-tight">
-                {bride.fullname}
-              </h3>
-              <p className="text-xs text-stone-400 font-medium">({bride.nickname})</p>
-
-              <div className="mt-4 space-y-1.5 text-xs text-stone-300 border-t border-white/5 pt-3">
-                <p><span className="text-stone-400">Bapak:</span> {bride.father}</p>
-                <p><span className="text-stone-400">Ibu:</span> {bride.mother}</p>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-white/5 space-y-1.5 text-xs text-stone-400">
-              <p className="flex items-start gap-1.5 text-[11px]">
-                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
-                <span>{bride.address}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-xs sm:text-sm text-stone-400 max-w-lg mt-6 font-editorial italic leading-relaxed">
+        <p className="text-xs sm:text-sm text-stone-400 max-w-lg mt-4 font-editorial italic leading-relaxed">
           Foto-foto dari sudut pandang para tamu tercinta. Momen spontan, tawa hangat, dan kenangan tak terlupakan yang diabadikan melalui Kamera Sekali Pakai Digital.
         </p>
 
