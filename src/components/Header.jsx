@@ -1,7 +1,24 @@
 import React from 'react';
-import { Camera, QrCode, Tv, Download } from 'lucide-react';
+import { Camera, QrCode, Tv, Download, Heart, MapPin, Instagram } from 'lucide-react';
 
 export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOpenSlideshow, onDownloadAll }) {
+  const groom = event.groom || {
+    nickname: "Hanif",
+    fullname: "drg. Moh. Irsyad Hanif, M.H",
+    father: "drg. Moh Baehaqi, M.M, M.Pd (Alm)",
+    mother: "Dr. Apt. Muslimah, S.Si, M.M, M.Pd",
+    address: "Jl. Raya Bandungrejo No.48 Mranggen, Demak",
+    instagram: "@hanifirsyad3"
+  };
+
+  const bride = event.bride || {
+    nickname: "Putri",
+    fullname: "drg. Putri Nur Azizah Zakiyah",
+    father: "Aris Budiman, S.Pd, M.Pd",
+    mother: "Tri Ungsi Rahayu, S.Pd",
+    address: "Jl. Beringin III No.16A RT.01/RW.04, Perumahan Bojong, Purbalingga"
+  };
+
   return (
     <header className="relative w-full text-center">
       {/* Top Banner Marquee */}
@@ -21,14 +38,14 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-[#0a0a0a]" />
 
-        {/* Large Sweeping Calligraphy Title (Cordelia Rose Style) */}
+        {/* Large Sweeping Calligraphy Title */}
         <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
           <h1 className="font-calligraphy text-6xl sm:text-8xl md:text-9xl text-white font-normal leading-none drop-shadow-2xl select-none">
             {event.hostName}
           </h1>
 
-          <div className="flex items-center gap-4 mt-3 text-[10px] sm:text-xs text-stone-300 uppercase tracking-editorial font-medium">
-            <span>EST. 2026</span>
+          <div className="flex items-center gap-3 mt-3 text-[11px] sm:text-xs text-stone-300 uppercase tracking-editorial font-medium">
+            <span>SABTU, {event.date.toUpperCase()}</span>
             <span>•</span>
             <span>{event.location}</span>
           </div>
@@ -74,7 +91,7 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
         </button>
       </div>
 
-      {/* Editorial Vertical Line & Quote Block */}
+      {/* Editorial Vertical Line & Couple Information Card */}
       <div className="px-6 py-8 flex flex-col items-center text-center">
         <div className="editorial-line-v" />
 
@@ -83,10 +100,74 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
         </h2>
 
         <p className="text-[10px] sm:text-xs uppercase tracking-editorial text-stone-400 font-semibold mt-2">
-          DOCUMENTING YOUR WEDDING STORY
+          DOCUMENTING OUR WEDDING STORY
         </p>
 
-        <p className="text-xs sm:text-sm text-stone-400 max-w-lg mt-4 font-editorial italic leading-relaxed">
+        {/* Wedding Couple Details Box */}
+        <div className="w-full max-w-2xl mt-8 p-6 sm:p-8 bg-[#121212] border border-white/10 rounded-3xl text-left shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full blur-2xl pointer-events-none" />
+
+          <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+            <div>
+              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold block">THE BRIDE & GROOM</span>
+              <h3 className="font-editorial text-xl sm:text-2xl text-white font-semibold mt-0.5">Data Mempelai</h3>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-amber-300/80 bg-amber-400/10 px-3 py-1.5 rounded-full border border-amber-400/20">
+              <Heart className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+              <span className="font-mono text-[11px]">8 Agustus 2026</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mempelai Pria */}
+            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+              <span className="text-[10px] uppercase tracking-widest text-amber-400/90 font-mono font-bold">MEMPELAI PRIA</span>
+              <h4 className="text-lg text-white font-semibold mt-1 font-editorial">{groom.fullname}</h4>
+              <p className="text-xs text-stone-300 mt-0.5 font-medium">({groom.nickname})</p>
+
+              <div className="mt-4 space-y-2 text-xs text-stone-400 border-t border-white/5 pt-3">
+                <p>
+                  <strong className="text-stone-300">Bapak:</strong> {groom.father}
+                </p>
+                <p>
+                  <strong className="text-stone-300">Ibu:</strong> {groom.mother}
+                </p>
+                <p className="flex items-start gap-1.5 mt-2">
+                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                  <span>{groom.address}</span>
+                </p>
+                {groom.instagram && (
+                  <p className="flex items-center gap-1.5 text-amber-300/90 font-mono text-[11px] mt-1">
+                    <Instagram className="w-3.5 h-3.5 shrink-0" />
+                    <span>{groom.instagram}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Mempelai Wanita */}
+            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+              <span className="text-[10px] uppercase tracking-widest text-amber-400/90 font-mono font-bold">MEMPELAI WANITA</span>
+              <h4 className="text-lg text-white font-semibold mt-1 font-editorial">{bride.fullname}</h4>
+              <p className="text-xs text-stone-300 mt-0.5 font-medium">({bride.nickname})</p>
+
+              <div className="mt-4 space-y-2 text-xs text-stone-400 border-t border-white/5 pt-3">
+                <p>
+                  <strong className="text-stone-300">Bapak:</strong> {bride.father}
+                </p>
+                <p>
+                  <strong className="text-stone-300">Ibu:</strong> {bride.mother}
+                </p>
+                <p className="flex items-start gap-1.5 mt-2">
+                  <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                  <span>{bride.address}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-xs sm:text-sm text-stone-400 max-w-lg mt-6 font-editorial italic leading-relaxed">
           Foto-foto dari sudut pandang para tamu tercinta. Momen spontan, tawa hangat, dan kenangan tak terlupakan yang diabadikan melalui Kamera Sekali Pakai Digital.
         </p>
 

@@ -14,25 +14,31 @@ export function getEventFromUrl() {
   let formattedTitle = "Putri & Hanif's Wedding Day";
   let hostName = "Putri & Hanif";
 
-  if (slug === 'putri-hanif') {
-    formattedTitle = "Putri & Hanif's Wedding Day";
-    hostName = "Putri & Hanif";
-  } else if (slug !== "putri-hanif" && slug.includes('-')) {
-    const names = slug.split('-').map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(' & ');
-    formattedTitle = `${names}'s Wedding Day`;
-    hostName = names;
-  }
-
   return {
     id: slug,
     title: formattedTitle,
     subtitle: `Lihat & abadikan momen spontan di ${formattedTitle} dengan tuaipandang, kamera sekali pakai digital.`,
-    date: "2 Agustus 2026",
-    location: "Hutan Kota by Plataran, Jakarta",
+    date: "8 Agustus 2026",
+    location: "Demak & Purbalingga, Jawa Tengah",
     coverImage: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
     maxShotsPerGuest: 10,
     hostName: hostName,
-    frameText: `${formattedTitle} • 02.08.2026`
+    frameText: `${formattedTitle} • 08.08.2026`,
+    groom: {
+      nickname: "Hanif",
+      fullname: "drg. Moh. Irsyad Hanif, M.H",
+      father: "drg. Moh Baehaqi, M.M, M.Pd (Alm)",
+      mother: "Dr. Apt. Muslimah, S.Si, M.M, M.Pd",
+      address: "Jl. Raya Bandungrejo No.48 Mranggen, Demak",
+      instagram: "@hanifirsyad3"
+    },
+    bride: {
+      nickname: "Putri",
+      fullname: "drg. Putri Nur Azizah Zakiyah",
+      father: "Aris Budiman, S.Pd, M.Pd",
+      mother: "Tri Ungsi Rahayu, S.Pd",
+      address: "Jl. Beringin III No.16A RT.01/RW.04, Perumahan Bojong, Purbalingga"
+    }
   };
 }
 
@@ -41,7 +47,7 @@ export const INITIAL_PHOTOS = [
     id: "photo_1",
     eventId: "default",
     guestName: "Aditya & Sarah",
-    wish: "Selamat menempuh hidup baru! Semoga bahagia selalu dan dilimpahi berkah! ✨💍",
+    wish: "Selamat menempuh hidup baru drg. Hanif & drg. Putri! Semoga bahagia selalu dan dilimpahi berkah! ✨💍",
     imageUrl: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
     presetId: "portra400",
     likes: 0,
@@ -51,7 +57,7 @@ export const INITIAL_PHOTOS = [
     id: "photo_2",
     eventId: "default",
     guestName: "Bimantoro",
-    wish: "Happy wedding bro! Happy long life together! 🥂🔥",
+    wish: "Happy wedding bro Hanif & Putri! Happy long life together! 🥂🔥",
     imageUrl: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80",
     presetId: "cinestill800t",
     likes: 0,
@@ -61,7 +67,7 @@ export const INITIAL_PHOTOS = [
     id: "photo_3",
     eventId: "default",
     guestName: "Dion & Maya",
-    wish: "Momen akadnya sakral banget, selamat ya kawan! 🎉❤️",
+    wish: "Momen akadnya sakral banget, selamat ya Putri & Hanif! 🎉❤️",
     imageUrl: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80",
     presetId: "fujisuperia",
     likes: 0,
