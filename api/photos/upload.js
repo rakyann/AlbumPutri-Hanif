@@ -69,12 +69,46 @@ export default async function handler(req, res) {
     let publicUrl = null;
     let driveFileId = null;
 
+    const SCRIPT_URL = getEnv('GOOGLE_SCRIPT_URL') || getEnv('GOOGLE_DRIVE_WEBHOOK_URL');
     const CLIENT_ID = getEnv('GOOGLE_CLIENT_ID');
     const CLIENT_SECRET = getEnv('GOOGLE_CLIENT_SECRET');
     const REFRESH_TOKEN = getEnv('GOOGLE_REFRESH_TOKEN');
-    const FOLDER_ID = getEnv('GOOGLE_DRIVE_FOLDER_ID');
+    const FOLDER_ID = getEnv('GOOGLE_DRIVE_FOLDER_ID') || '1SuAHBwRZbNEYlGz6NJZaxKJ_mWO95uEp';
 
-    if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN && FOLDER_ID) {
+    // Method 1: Google Apps Script Webhook (Zero OAuth configuration needed!)
+    if (SCRIPT_URL) {
+      try {
+        const fileBuffer = fs.readFileSync(file.filepath);
+        const base64Data = fileBuffer.toString('base64');
+        const filename = `tuaipandang_${eventId}_${Date.now()}_${file.originalFilename || 'photo.jpg'}`;
+
+        const webhookRes = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64: base64Data,
+            mimeType: file.mimetype || 'image/jpeg',
+            filename: filename,
+            folderId: FOLDER_ID,
+            guestName: guestSessionId,
+            caption: caption
+          })
+        });
+
+        if (webhookRes.ok) {
+          const webhookData = await webhookRes.json();
+          if (webhookData.url || webhookData.driveFileId) {
+            publicUrl = webhookData.url;
+            driveFileId = webhookData.driveFileId;
+          }
+        }
+      } catch (scriptErr) {
+        console.warn("Google Apps Script Webhook upload warning:", scriptErr.message);
+      }
+    }
+
+    // Method 2: Google OAuth2 Drive API
+    if (!publicUrl && CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN && FOLDER_ID) {
       try {
         const oauth2Client = new google.auth.OAuth2(
           CLIENT_ID,
