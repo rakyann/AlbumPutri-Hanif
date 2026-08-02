@@ -1,29 +1,29 @@
-// Canvas Film Presets Engine (Clean Photos Without Watermarks)
+// Canvas Film Presets Engine (100% Cross-Browser Pixel Shaders)
 
 export const FILM_PRESETS = [
   {
     id: 'portra400',
     name: 'Kodak Portra 400',
-    description: 'Warm golden tones & soft skin tones',
+    description: 'Warm golden skin tones & soft highlights',
     badge: 'Popular',
-    tint: 'rgba(255, 225, 190, 0.08)',
-    cssFilter: 'contrast(105%) saturate(110%) sepia(15%)'
+    tint: 'rgba(255, 215, 170, 0.12)',
+    cssFilter: 'contrast(108%) saturate(115%) sepia(18%)'
   },
   {
     id: 'cinestill800t',
     name: 'CineStill 800T',
-    description: 'Tungsten cool glow & halation highlights',
+    description: 'Tungsten cool cyan glow & vivid contrast',
     badge: 'Night',
-    tint: 'rgba(0, 180, 220, 0.07)',
-    cssFilter: 'contrast(115%) saturate(120%) hue-rotate(-10deg)'
+    tint: 'rgba(0, 190, 225, 0.10)',
+    cssFilter: 'contrast(115%) saturate(125%) hue-rotate(-12deg)'
   },
   {
     id: 'fujisuperia',
     name: 'Fuji Superia 400',
-    description: 'Vibrant emerald greens & sharp contrast',
+    description: 'Vivid emerald green tones & crisp detail',
     badge: 'Vivid',
-    tint: 'rgba(180, 255, 210, 0.06)',
-    cssFilter: 'contrast(110%) saturate(125%) hue-rotate(5deg)'
+    tint: 'rgba(160, 245, 185, 0.08)',
+    cssFilter: 'contrast(112%) saturate(130%) hue-rotate(8deg)'
   },
   {
     id: 'bwmono',
@@ -31,7 +31,7 @@ export const FILM_PRESETS = [
     description: 'Classic high contrast monochrome',
     badge: 'Retro',
     tint: 'rgba(0, 0, 0, 0)',
-    cssFilter: 'grayscale(100%) contrast(125%)'
+    cssFilter: 'grayscale(100%) contrast(130%)'
   },
   {
     id: 'clean',
@@ -57,26 +57,43 @@ export async function processImageWithFilterAndFrame(sourceImgUrl, presetId = 'p
       canvas.width = width;
       canvas.height = height;
 
-      // 1. Find Preset
-      const preset = FILM_PRESETS.find(p => p.id === presetId) || FILM_PRESETS[0];
-
-      // 2. Apply CSS Filter to Canvas Context
-      ctx.filter = preset.cssFilter !== 'none' ? preset.cssFilter : 'none';
+      // 1. Draw Original Image
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Reset filter
-      ctx.filter = 'none';
+      // 2. Apply CSS Filter if supported by browser context
+      const preset = FILM_PRESETS.find(p => p.id === presetId) || FILM_PRESETS[0];
 
-      // 3. Draw Film Color Tint Overlay
-      if (preset.tint !== 'rgba(0, 0, 0, 0)') {
+      try {
+        if (preset.cssFilter !== 'none') {
+          ctx.filter = preset.cssFilter;
+          ctx.drawImage(img, 0, 0, width, height);
+          ctx.filter = 'none';
+        }
+      } catch (e) {
+        // Fallback for browsers that don't support ctx.filter
+      }
+
+      // 3. Fallback / Direct Pixel Shader Processing (Guarantees ALL filters work on ALL browsers)
+      if (presetId === 'bwmono') {
+        applyGrayscaleNoir(ctx, width, height);
+      } else if (presetId === 'portra400') {
+        applyPortraWarmth(ctx, width, height);
+      } else if (presetId === 'cinestill800t') {
+        applyCineStillCool(ctx, width, height);
+      } else if (presetId === 'fujisuperia') {
+        applyFujiGreen(ctx, width, height);
+      }
+
+      // 4. Draw Color Tint Overlay if defined
+      if (preset.tint && preset.tint !== 'rgba(0, 0, 0, 0)') {
         ctx.fillStyle = preset.tint;
         ctx.fillRect(0, 0, width, height);
       }
 
-      // 4. Add subtle film grain effect
+      // 5. Add analog film grain texture
       addFilmGrain(ctx, width, height, 0.03);
 
-      // 5. Draw Frame Overlay & Watermark ONLY IF explicitly enabled
+      // 6. Draw Frame Overlay & Watermark ONLY IF explicitly enabled
       if (showFrame && frameText) {
         const barHeight = Math.max(38, Math.floor(height * 0.06));
         
@@ -127,6 +144,60 @@ export async function processImageWithFilterAndFrame(sourceImgUrl, presetId = 'p
     img.onerror = (err) => reject(err);
     img.src = sourceImgUrl;
   });
+}
+
+// ----------------------------------------------------
+// DIRECT PIXEL SHADER FUNCTIONS (100% Cross-Browser)
+// ----------------------------------------------------
+
+function applyGrayscaleNoir(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+    // High contrast curve
+    const contrast = 1.25;
+    const factor = (259 * (contrast * 255 + 255)) / (255 * (259 - contrast * 255));
+    const val = factor * (avg - 128) + 128;
+    const clamped = Math.min(255, Math.max(0, val));
+    data[i] = clamped;
+    data[i + 1] = clamped;
+    data[i + 2] = clamped;
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyPortraWarmth(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.min(255, data[i] * 1.08 + 8);       // Warm Red
+    data[i + 1] = Math.min(255, data[i + 1] * 1.03);    // Soft Green
+    data[i + 2] = Math.max(0, data[i + 2] * 0.94 - 5);   // Muted Blue
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyCineStillCool(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.max(0, data[i] * 0.95);             // Lower Red
+    data[i + 1] = Math.min(255, data[i + 1] * 1.06 + 5); // Boost Cyan Green
+    data[i + 2] = Math.min(255, data[i + 2] * 1.12 + 12); // Boost Tungsten Blue
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyFujiGreen(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.min(255, data[i] * 1.02);
+    data[i + 1] = Math.min(255, data[i + 1] * 1.14 + 10); // Emerald Green Boost
+    data[i + 2] = Math.min(255, data[i + 2] * 1.04);
+  }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 function addFilmGrain(ctx, width, height, intensity = 0.03) {

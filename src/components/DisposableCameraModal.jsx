@@ -25,6 +25,24 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
     return () => stopCameraStream();
   }, [isOpen, facingMode]);
 
+  // Handle hardware torch toggle on mobile devices
+  useEffect(() => {
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
+    if (track && 'applyConstraints' in track) {
+      try {
+        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+        if (capabilities.torch) {
+          track.applyConstraints({
+            advanced: [{ torch: flashMode }]
+          }).catch(err => console.warn('Torch constraint warning:', err));
+        }
+      } catch (err) {
+        console.warn('Torch capability check error:', err);
+      }
+    }
+  }, [flashMode, stream]);
+
   const startCameraStream = async () => {
     stopCameraStream();
     setCameraError(null);
@@ -70,10 +88,9 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
 
     playShutterSound();
 
-    if (flashMode) {
-      setIsFlashing(true);
-      setTimeout(() => setIsFlashing(false), 300);
-    }
+    // Trigger Screen Flash Burst Effect regardless of device torch support
+    setIsFlashing(true);
+    setTimeout(() => setIsFlashing(false), 400);
 
     try {
       let rawDataUrl = null;
@@ -151,6 +168,7 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
 
   return (
     <div className="modal-backdrop-editorial z-50">
+      {/* Bright Screen Flash Overlay */}
       {isFlashing && <div className="screen-flash-overlay" />}
 
       <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] animate-scale-up">
