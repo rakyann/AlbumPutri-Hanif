@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { google } from 'googleapis';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -48,8 +49,15 @@ export default async function handler(req, res) {
     const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
     const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
-    // Upload to Google Drive if credentials exist
-    if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN && FOLDER_ID) {
+    // Log diagnostic warning if env variables are missing
+    if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN || !FOLDER_ID) {
+      console.warn("⚠️ Google Drive credentials missing in .env or Vercel environment variables!");
+      console.warn(`GOOGLE_CLIENT_ID: ${CLIENT_ID ? 'OK' : 'MISSING'}`);
+      console.warn(`GOOGLE_CLIENT_SECRET: ${CLIENT_SECRET ? 'OK' : 'MISSING'}`);
+      console.warn(`GOOGLE_REFRESH_TOKEN: ${REFRESH_TOKEN ? 'OK' : 'MISSING'}`);
+      console.warn(`GOOGLE_DRIVE_FOLDER_ID: ${FOLDER_ID ? 'OK' : 'MISSING'}`);
+    } else {
+      // Upload to Google Drive
       try {
         const oauth2Client = new google.auth.OAuth2(
           CLIENT_ID,
@@ -86,8 +94,9 @@ export default async function handler(req, res) {
         } catch (e) {}
 
         publicUrl = `https://lh3.googleusercontent.com/d/${driveFileId}`;
+        console.log(`✅ Successfully uploaded photo to Google Drive! File ID: ${driveFileId}`);
       } catch (driveErr) {
-        console.warn("Google Drive upload warning:", driveErr.message);
+        console.error("❌ Google Drive API Upload Error:", driveErr.message);
       }
     }
 
@@ -117,7 +126,7 @@ export default async function handler(req, res) {
       driveFileId: driveFileId,
       url: publicUrl,
       photo: newPhotoRecord,
-      message: 'Foto berhasil diunggah!'
+      message: driveFileId ? 'Foto berhasil diunggah ke Google Drive!' : 'Foto tersimpan secara lokal.'
     });
 
   } catch (error) {

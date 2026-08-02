@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.0",
     "canvas-confetti": "^1.9.4",
+    "dotenv": "^17.4.2",
     "formidable": "^3.5.2",
     "googleapis": "^144.0.0",
     "jszip": "^3.10.1",
