@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Heart, Download, Calendar } from 'lucide-react';
+import { X, Heart, Download, Calendar, Share2 } from 'lucide-react';
 
 export default function PhotoLightbox({ photo, onClose, onLikePhoto }) {
   if (!photo) return null;
@@ -11,6 +11,47 @@ export default function PhotoLightbox({ photo, onClose, onLikePhoto }) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleShare = async () => {
+    try {
+      // Fetch the image as a blob so we can share the actual file
+      const response = await fetch(photo.imageUrl);
+      const blob = await response.blob();
+      const ext = blob.type.includes('png') ? 'png' : 'jpg';
+      const fileName = `tuaipandang_${(photo.guestName || 'foto').replace(/\s+/g, '_')}.${ext}`;
+      const file = new File([blob], fileName, { type: blob.type });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Share actual image file — works great on Android & iOS
+        await navigator.share({
+          files: [file],
+          title: `📸 Foto dari Pernikahan Putri & Hanif`,
+          text: `Momen spesial dari pernikahan Putri & Hanif – 8 Agustus 2026 💍\n\nLihat semua foto di: https://tuaipandang.vercel.app/e/putri-hanif`
+        });
+      } else if (navigator.share) {
+        // Share via URL only (fallback)
+        await navigator.share({
+          title: `📸 Foto dari Pernikahan Putri & Hanif`,
+          text: `Momen spesial dari pernikahan Putri & Hanif – 8 Agustus 2026 💍`,
+          url: photo.imageUrl
+        });
+      } else {
+        // Desktop fallback: copy URL to clipboard
+        await navigator.clipboard.writeText(photo.imageUrl);
+        alert('Link foto berhasil disalin! Tempel di IG, WA, atau aplikasi lain.');
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        // Fallback: copy URL
+        try {
+          await navigator.clipboard.writeText(photo.imageUrl);
+          alert('Link foto disalin ke clipboard!');
+        } catch {
+          console.error('Share failed:', err);
+        }
+      }
+    }
   };
 
   const presetLabels = {
@@ -83,23 +124,34 @@ export default function PhotoLightbox({ photo, onClose, onLikePhoto }) {
 
           {/* Minimalist Editorial Action Buttons */}
           <div className="space-y-3 pt-6 border-t border-white/10">
-            <div className="flex items-center gap-2">
-              {/* Like Outline Pill */}
-              <button
-                onClick={() => onLikePhoto(photo.id)}
-                className="flex-1 py-2.5 px-4 rounded-full border border-white/30 text-[10px] uppercase tracking-widest font-semibold text-stone-200 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
-              >
-                <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-                <span>{photo.likes || 0} SUKA</span>
-              </button>
+            {/* Like button — full width */}
+            <button
+              onClick={() => onLikePhoto(photo.id)}
+              className="w-full py-2.5 px-4 rounded-full border border-white/30 text-[10px] uppercase tracking-widest font-semibold text-stone-200 hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
+            >
+              <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+              <span>{photo.likes || 0} SUKA</span>
+            </button>
 
-              {/* Download Solid White Pill */}
+            {/* Download + Share side by side */}
+            <div className="flex items-center gap-2">
+              {/* Download */}
               <button
                 onClick={handleDownload}
-                className="flex-1 py-2.5 px-4 rounded-full bg-white text-black text-[10px] uppercase tracking-widest font-bold hover:bg-stone-200 transition-all flex items-center justify-center gap-2 shadow-lg"
+                className="flex-1 py-2.5 px-3 rounded-full bg-white text-black text-[10px] uppercase tracking-widest font-bold hover:bg-stone-200 transition-all flex items-center justify-center gap-1.5 shadow-lg"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>UNDUH FOTO</span>
+                <span>UNDUH</span>
+              </button>
+
+              {/* Share */}
+              <button
+                onClick={handleShare}
+                className="flex-1 py-2.5 px-3 rounded-full bg-gradient-to-r from-rose-500 to-purple-600 text-white text-[10px] uppercase tracking-widest font-bold hover:opacity-90 transition-all flex items-center justify-center gap-1.5 shadow-lg"
+                title="Share ke IG, WA, dll"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>BAGIKAN</span>
               </button>
             </div>
           </div>
