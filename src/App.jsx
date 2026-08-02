@@ -70,19 +70,24 @@ export default function App() {
       const res = await fetch(`/api/photos?eventId=${eventId}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.success && Array.isArray(data.photos) && data.photos.length > 0) {
-          setPhotos(prev => {
-            const currentList = fallbackLocal || prev;
-            const map = new Map();
-            // Merge server photos first, then local photos
-            data.photos.forEach(p => map.set(p.id, p));
-            currentList.forEach(p => {
-              if (!map.has(p.id)) map.set(p.id, p);
+        if (data.success && Array.isArray(data.photos)) {
+          if (data.photos.length === 0) {
+            setPhotos([]);
+            saveStoredPhotos([], eventId);
+          } else {
+            setPhotos(prev => {
+              const currentList = fallbackLocal || prev;
+              const map = new Map();
+              // Merge server photos first, then local photos
+              data.photos.forEach(p => map.set(p.id, p));
+              currentList.forEach(p => {
+                if (!map.has(p.id)) map.set(p.id, p);
+              });
+              const merged = Array.from(map.values());
+              saveStoredPhotos(merged, eventId);
+              return merged;
             });
-            const merged = Array.from(map.values());
-            saveStoredPhotos(merged, eventId);
-            return merged;
-          });
+          }
         }
       }
     } catch (err) {
