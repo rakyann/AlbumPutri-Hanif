@@ -1,8 +1,25 @@
-import 'dotenv/config';
 import { google } from 'googleapis';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
+// Explicitly load .env file from working directory
+function getEnv(key) {
+  if (process.env[key]) return process.env[key];
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const parsed = dotenv.parse(fs.readFileSync(envPath));
+      if (parsed[key]) {
+        process.env[key] = parsed[key];
+        return parsed[key];
+      }
+    }
+  } catch (e) {}
+  return '';
+}
 
 export default async function handler(req, res) {
-  // Helper functions compatible with both Node HTTP ServerResponse & Express/Vercel
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
       return res.status(statusCode).json(data);
@@ -27,8 +44,8 @@ export default async function handler(req, res) {
     res.end(htmlContent);
   };
 
-  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+  const CLIENT_ID = getEnv('GOOGLE_CLIENT_ID');
+  const CLIENT_SECRET = getEnv('GOOGLE_CLIENT_SECRET');
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
     return sendJson(500, { error: 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are missing in .env.' });

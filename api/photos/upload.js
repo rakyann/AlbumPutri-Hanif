@@ -1,13 +1,29 @@
-import 'dotenv/config';
 import { google } from 'googleapis';
 import formidable from 'formidable';
 import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+function getEnv(key) {
+  if (process.env[key]) return process.env[key];
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const parsed = dotenv.parse(fs.readFileSync(envPath));
+      if (parsed[key]) {
+        process.env[key] = parsed[key];
+        return parsed[key];
+      }
+    }
+  } catch (e) {}
+  return '';
+}
 
 if (!global._tuaipandangPhotos) {
   global._tuaipandangPhotos = {};
@@ -53,10 +69,10 @@ export default async function handler(req, res) {
     let publicUrl = null;
     let driveFileId = null;
 
-    const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-    const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-    const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
-    const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
+    const CLIENT_ID = getEnv('GOOGLE_CLIENT_ID');
+    const CLIENT_SECRET = getEnv('GOOGLE_CLIENT_SECRET');
+    const REFRESH_TOKEN = getEnv('GOOGLE_REFRESH_TOKEN');
+    const FOLDER_ID = getEnv('GOOGLE_DRIVE_FOLDER_ID');
 
     if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN && FOLDER_ID) {
       try {
