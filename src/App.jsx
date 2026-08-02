@@ -42,12 +42,12 @@ export default function App() {
     setRemainingRolls(getRemainingRolls(currentEvent.id, currentEvent.maxShotsPerGuest));
 
     // Fetch shared photos from cloud server API
-    fetchServerPhotos(currentEvent.id, local);
+    fetchServerPhotos(currentEvent.id);
 
-    // Sync polling every 4 seconds across all devices
+    // Sync polling every 3 seconds across all devices
     const syncInterval = setInterval(() => {
-      fetchServerPhotos(currentEvent.id, null);
-    }, 4000);
+      fetchServerPhotos(currentEvent.id);
+    }, 3000);
 
     const handlePopState = () => {
       const ev = getStoredEvent();
@@ -55,7 +55,7 @@ export default function App() {
       const loc = getStoredPhotos(ev.id);
       setPhotos(loc);
       setRemainingRolls(getRemainingRolls(ev.id, ev.maxShotsPerGuest));
-      fetchServerPhotos(ev.id, loc);
+      fetchServerPhotos(ev.id);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -65,29 +65,15 @@ export default function App() {
     };
   }, []);
 
-  const fetchServerPhotos = async (eventId, fallbackLocal = null) => {
+  const fetchServerPhotos = async (eventId) => {
     try {
       const res = await fetch(`/api/photos?eventId=${eventId}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.photos)) {
-          if (data.photos.length === 0) {
-            setPhotos([]);
-            saveStoredPhotos([], eventId);
-          } else {
-            setPhotos(prev => {
-              const currentList = fallbackLocal || prev;
-              const map = new Map();
-              // Merge server photos first, then local photos
-              data.photos.forEach(p => map.set(p.id, p));
-              currentList.forEach(p => {
-                if (!map.has(p.id)) map.set(p.id, p);
-              });
-              const merged = Array.from(map.values());
-              saveStoredPhotos(merged, eventId);
-              return merged;
-            });
-          }
+          // Strictly set server photos as authoritative photo list
+          setPhotos(data.photos);
+          saveStoredPhotos(data.photos, eventId);
         }
       }
     } catch (err) {

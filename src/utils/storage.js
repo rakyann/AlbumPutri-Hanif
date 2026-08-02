@@ -56,7 +56,14 @@ export function getStoredEvent() {
 
 export function getStoredPhotos(eventId = "default") {
   const data = localStorage.getItem(STORAGE_KEYS.PHOTOS + eventId);
-  return data ? JSON.parse(data) : [];
+  if (!data) return [];
+  try {
+    const parsed = JSON.parse(data);
+    // Filter out old sample photos
+    return parsed.filter(p => !p.id.startsWith('photo_1') && !p.id.startsWith('photo_2') && !p.id.startsWith('photo_3') && !p.id.startsWith('photo_4'));
+  } catch (e) {
+    return [];
+  }
 }
 
 export function saveStoredPhotos(photosArray, eventId = "default") {
