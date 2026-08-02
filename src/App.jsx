@@ -37,19 +37,58 @@ export default function App() {
   useEffect(() => {
     const currentEvent = getStoredEvent();
     setEvent(currentEvent);
-    setPhotos(getStoredPhotos(currentEvent.id));
+    const local = getStoredPhotos(currentEvent.id);
+    setPhotos(local);
     setRemainingRolls(getRemainingRolls(currentEvent.id, currentEvent.maxShotsPerGuest));
+
+    // Fetch shared photos from cloud server API
+    fetchServerPhotos(currentEvent.id, local);
+
+    // Sync polling every 4 seconds across all devices
+    const syncInterval = setInterval(() => {
+      fetchServerPhotos(currentEvent.id, null);
+    }, 4000);
 
     const handlePopState = () => {
       const ev = getStoredEvent();
       setEvent(ev);
-      setPhotos(getStoredPhotos(ev.id));
+      const loc = getStoredPhotos(ev.id);
+      setPhotos(loc);
       setRemainingRolls(getRemainingRolls(ev.id, ev.maxShotsPerGuest));
+      fetchServerPhotos(ev.id, loc);
     };
 
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => {
+      clearInterval(syncInterval);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
+
+  const fetchServerPhotos = async (eventId, fallbackLocal = null) => {
+    try {
+      const res = await fetch(`/api/photos?eventId=${eventId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.photos) && data.photos.length > 0) {
+          setPhotos(prev => {
+            const currentList = fallbackLocal || prev;
+            const map = new Map();
+            // Merge server photos first, then local photos
+            data.photos.forEach(p => map.set(p.id, p));
+            currentList.forEach(p => {
+              if (!map.has(p.id)) map.set(p.id, p);
+            });
+            const merged = Array.from(map.values());
+            saveStoredPhotos(merged, eventId);
+            return merged;
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Cloud photo sync warning:", err.message);
+    }
+  };
 
   const handlePhotoCaptured = (processedUrl, presetId) => {
     setTempCapturedData({
@@ -59,7 +98,7 @@ export default function App() {
     setIsUploadOpen(true);
   };
 
-  const handleSubmitPhoto = (newPhotoData) => {
+  const handleSubmitPhoto = async (newPhotoData) => {
     const newRolls = decrementRolls(event.id);
     setRemainingRolls(newRolls);
 
@@ -79,6 +118,15 @@ export default function App() {
     setPhotos(updated);
     saveStoredPhotos(updated, event.id);
     setTempCapturedData(null);
+
+    // Sync to shared server API so other devices see this photo immediately
+    try {
+      await fetch(`/api/photos?eventId=${event.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPhoto)
+      });
+    } catch (e) {}
   };
 
   const handleLikePhoto = (photoId) => {
