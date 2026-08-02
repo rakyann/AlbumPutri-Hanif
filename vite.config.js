@@ -11,6 +11,41 @@ function apiDevPlugin() {
     name: 'api-dev-plugin',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
+        // Enhance raw Node res object with Express/Vercel serverless helper methods
+        if (!res.status) {
+          res.status = function (statusCode) {
+            res.statusCode = statusCode;
+            return res;
+          };
+        }
+
+        if (!res.json) {
+          res.json = function (data) {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(data));
+          };
+        }
+
+        if (!res.redirect) {
+          res.redirect = function (url) {
+            res.statusCode = 302;
+            res.setHeader('Location', url);
+            res.end();
+          };
+        }
+
+        if (!res.send) {
+          res.send = function (content) {
+            if (typeof content === 'object') {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(content));
+            } else {
+              res.setHeader('Content-Type', 'text/html; charset=utf-8');
+              res.end(content);
+            }
+          };
+        }
+
         if (req.url.startsWith('/api/auth/google')) {
           try {
             const urlObj = new URL(req.url, `http://${req.headers.host}`);
