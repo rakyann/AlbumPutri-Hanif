@@ -18,7 +18,30 @@ export default async function handler(req, res) {
   const eventId = (req.query && req.query.eventId) || 'putri-hanif';
 
   if (req.method === 'GET') {
-    const list = global._tuaipandangPhotos[eventId] || [];
+    let list = global._tuaipandangPhotos[eventId] || [];
+    
+    // Auto-sync with Google Drive: filter out any photo deleted from Google Drive folder
+    if (list.length > 0) {
+      try {
+        const checkResults = await Promise.all(list.map(async (photo) => {
+          if (!photo.driveFileId) return photo;
+          try {
+            const checkRes = await fetch(`https://lh3.googleusercontent.com/d/${photo.driveFileId}`, { method: 'HEAD' });
+            if (checkRes.ok || checkRes.status === 200 || checkRes.status === 302 || checkRes.status === 303) {
+              return photo;
+            }
+            return null; // Photo deleted from Google Drive
+          } catch (e) {
+            return photo;
+          }
+        }));
+        list = checkResults.filter(Boolean);
+        global._tuaipandangPhotos[eventId] = list;
+      } catch (err) {
+        console.warn("Drive sync check warning:", err.message);
+      }
+    }
+
     return sendJson(200, {
       success: true,
       photos: list
