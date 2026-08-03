@@ -1,7 +1,7 @@
 // LocalStorage & Dynamic Event Routing State Management
 
 // Bump this version to auto-clear all localStorage photo caches on next visit
-const CACHE_VERSION = 'v2-clean-20260802';
+const CACHE_VERSION = 'v3-clean-20260803';
 
 function checkAndClearOldCache() {
   const stored = localStorage.getItem('tuaipandang_cache_version');
