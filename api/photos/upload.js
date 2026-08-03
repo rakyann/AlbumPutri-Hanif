@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     let publicUrl = null;
     let driveFileId = null;
 
-    const SCRIPT_URL = getEnv('GOOGLE_SCRIPT_URL') || getEnv('GOOGLE_DRIVE_WEBHOOK_URL');
+    const SCRIPT_URL = getEnv('GOOGLE_SCRIPT_URL') || getEnv('GOOGLE_DRIVE_WEBHOOK_URL') || 'https://script.google.com/macros/s/AKfycbwD0pl-WvHefZEeD1CJGStIllcNBazdvvvyLwLwmvMwBEFR5MIp5GjBfkTDJJI2np6ozw/exec';
     const CLIENT_ID = getEnv('GOOGLE_CLIENT_ID');
     const CLIENT_SECRET = getEnv('GOOGLE_CLIENT_SECRET');
     const REFRESH_TOKEN = getEnv('GOOGLE_REFRESH_TOKEN');
