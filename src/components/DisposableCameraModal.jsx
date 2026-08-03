@@ -7,7 +7,7 @@ export default function DisposableCameraModal({ isOpen, onClose, remainingRolls,
   const [stream, setStream] = useState(null);
   const [facingMode, setFacingMode] = useState('environment');
   const [flashMode, setFlashMode] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState('portra400');
+  const [selectedPreset, setSelectedPreset] = useState('clean');
   const [showFrame, setShowFrame] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
   const [cameraError, setCameraError] = useState(null);

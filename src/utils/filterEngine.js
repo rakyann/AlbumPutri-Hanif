@@ -2,6 +2,14 @@
 
 export const FILM_PRESETS = [
   {
+    id: 'clean',
+    name: 'Clean Original',
+    description: 'Natural uncompressed color',
+    badge: 'Natural',
+    tint: 'rgba(0, 0, 0, 0)',
+    cssFilter: 'none'
+  },
+  {
     id: 'portra400',
     name: 'Kodak Portra 400',
     description: 'Warm golden skin tones & soft highlights',
@@ -32,14 +40,6 @@ export const FILM_PRESETS = [
     badge: 'Retro',
     tint: 'rgba(0, 0, 0, 0)',
     cssFilter: 'grayscale(100%) contrast(130%)'
-  },
-  {
-    id: 'clean',
-    name: 'Clean Original',
-    description: 'Natural uncompressed color',
-    badge: 'Natural',
-    tint: 'rgba(0, 0, 0, 0)',
-    cssFilter: 'none'
   }
 ];
 

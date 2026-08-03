@@ -1,5 +1,22 @@
 // LocalStorage & Dynamic Event Routing State Management
 
+// Bump this version to auto-clear all localStorage photo caches on next visit
+const CACHE_VERSION = 'v2-clean-20260802';
+
+function checkAndClearOldCache() {
+  const stored = localStorage.getItem('tuaipandang_cache_version');
+  if (stored !== CACHE_VERSION) {
+    // Clear all tuaipandang keys
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('tuaipandang_'))
+      .forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('tuaipandang_cache_version', CACHE_VERSION);
+  }
+}
+
+// Run immediately on module load
+checkAndClearOldCache();
+
 export function getEventFromUrl() {
   const path = window.location.pathname;
   const parts = path.split('/').filter(Boolean);
@@ -58,9 +75,7 @@ export function getStoredPhotos(eventId = "default") {
   const data = localStorage.getItem(STORAGE_KEYS.PHOTOS + eventId);
   if (!data) return [];
   try {
-    const parsed = JSON.parse(data);
-    // Filter out old sample photos
-    return parsed.filter(p => !p.id.startsWith('photo_1') && !p.id.startsWith('photo_2') && !p.id.startsWith('photo_3') && !p.id.startsWith('photo_4'));
+    return JSON.parse(data);
   } catch (e) {
     return [];
   }
