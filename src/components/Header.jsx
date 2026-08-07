@@ -117,10 +117,10 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
           </button>
         </div>
 
-        {/* Full-width Large Card CTA Button (Matching Screenshot Proportions) */}
+        {/* Full-width Large Card CTA Button - Dashed Cream Border Style */}
         <button
           onClick={onOpenCamera}
-          className="mt-6 w-full py-10 sm:py-12 px-6 rounded-2xl sm:rounded-3xl border-2 border-[#2c2523] bg-white/50 text-[#2c2523] hover:bg-[#2c2523] hover:text-[#faf6f0] transition-all duration-300 shadow-sm hover:shadow-xl cursor-pointer flex items-center justify-center gap-3.5 text-sm sm:text-base font-black tracking-editorial group"
+          className="mt-6 w-full py-10 sm:py-12 px-6 rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#c8bdab] bg-white/60 text-[#2c2523] hover:bg-[#2c2523] hover:text-[#faf6f0] hover:border-[#2c2523] transition-all duration-300 shadow-sm hover:shadow-xl cursor-pointer flex items-center justify-center gap-3.5 text-sm sm:text-base font-black tracking-editorial group"
         >
           <Camera className="w-6 h-6 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
           <span>AMBIL FOTO (DISPOSABLE CAMERA)</span>
