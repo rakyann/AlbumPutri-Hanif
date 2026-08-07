@@ -20,7 +20,7 @@ import JSZip from 'jszip';
 export default function App() {
   const [event, setEvent] = useState(getStoredEvent());
   const [photos, setPhotos] = useState([]);
-  const [remainingRolls, setRemainingRolls] = useState(10);
+  const [remainingRolls, setRemainingRolls] = useState(3);
 
   // Modals
   const [isCameraOpen, setIsCameraOpen] = useState(false);

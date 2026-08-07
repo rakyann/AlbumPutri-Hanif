@@ -1,7 +1,7 @@
 // LocalStorage & Dynamic Event Routing State Management
 
 // Bump this version to auto-clear all localStorage photo caches on next visit
-const CACHE_VERSION = 'v3-clean-20260803';
+const CACHE_VERSION = 'v4-roll-3-limit-20260807';
 
 function checkAndClearOldCache() {
   const stored = localStorage.getItem('tuaipandang_cache_version');
@@ -38,7 +38,7 @@ export function getEventFromUrl() {
     date: "8 Agustus 2026",
     location: "Demak & Purbalingga, Jawa Tengah",
     coverImage: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
-    maxShotsPerGuest: 10,
+    maxShotsPerGuest: 3,
     hostName: hostName,
     frameText: `${formattedTitle} • 08.08.2026`,
     groom: {
@@ -89,7 +89,7 @@ export function clearAllPhotos(eventId = "default") {
   localStorage.removeItem(STORAGE_KEYS.PHOTOS + eventId);
 }
 
-export function getRemainingRolls(eventId = "default", maxShots = 10) {
+export function getRemainingRolls(eventId = "default", maxShots = 3) {
   const key = STORAGE_KEYS.ROLL_COUNT + eventId;
   const val = localStorage.getItem(key);
   if (val === null) {
