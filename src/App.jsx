@@ -168,7 +168,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a] text-gray-100 flex flex-col items-center">
+    <div className="relative min-h-screen bg-[#ede5d8] text-[#2c2523] flex flex-col items-center">
       {/* Editorial Outer Container Shell */}
       <div className="editorial-container">
         {/* Header Banner */}
@@ -191,14 +191,14 @@ export default function App() {
         </main>
 
         {/* Editorial Footer */}
-        <footer className="p-8 text-center text-xs text-stone-400 border-t border-white/10 mt-8 space-y-2">
-          <p className="font-calligraphy text-2xl text-white">
+        <footer className="p-8 text-center text-xs text-[#786c65] border-t border-[#e5dcd0] mt-8 space-y-2">
+          <p className="font-calligraphy text-3xl text-[#2c2523]">
             {event.hostName}
           </p>
-          <p className="text-[10px] uppercase tracking-editorial font-semibold">
+          <p className="text-[10px] uppercase tracking-editorial font-semibold text-[#786c65]">
             {event.title} • {event.date}
           </p>
-          <p className="text-[9px] text-stone-300 tracking-widest uppercase">
+          <p className="text-[9px] text-[#918379] tracking-widest uppercase">
             POWERED BY TUAIPANDANG DIGITAL DISPOSABLE CAMERA
           </p>
         </footer>
