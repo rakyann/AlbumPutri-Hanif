@@ -117,13 +117,49 @@ export default function Header({ event, photoCount, onOpenCamera, onOpenQR, onOp
           </button>
         </div>
 
-        {/* Full-width Large Card CTA Button (Matching Screenshot Proportions) */}
+        {/* Vintage Disposable Camera Hero CTA Badge */}
         <button
           onClick={onOpenCamera}
-          className="mt-6 w-full py-10 sm:py-12 px-6 rounded-2xl sm:rounded-3xl border-2 border-[#2c2523] bg-white/50 text-[#2c2523] hover:bg-[#2c2523] hover:text-[#faf6f0] transition-all duration-300 shadow-sm hover:shadow-xl cursor-pointer flex items-center justify-center gap-3.5 text-sm sm:text-base font-black tracking-editorial group"
+          className="mt-8 w-full max-w-xl sm:max-w-2xl p-5 sm:p-7 bg-gradient-to-br from-[#231e1c] via-[#2c2523] to-[#1a1514] text-[#faf6f0] border-2 border-amber-600/40 rounded-3xl shadow-2xl hover:shadow-amber-900/30 hover:border-amber-500 hover:scale-[1.01] active:scale-[0.98] transition-all duration-300 cursor-pointer relative overflow-hidden group flex items-center justify-between gap-4"
         >
-          <Camera className="w-6 h-6 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
-          <span>AMBIL FOTO (DISPOSABLE CAMERA)</span>
+          {/* Decorative Film Edge Viewfinder Lines */}
+          <div className="absolute top-2 left-6 right-6 flex justify-between text-[8px] font-mono text-amber-500/40 tracking-widest pointer-events-none select-none">
+            <span>◄ FILM DISPOSABLE 35MM ►</span>
+            <span>READY 36/36</span>
+          </div>
+
+          <div className="flex items-center gap-4 sm:gap-6 z-10 pt-2">
+            {/* Viewfinder Lens Icon Box */}
+            <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-2xl bg-[#141110] border-2 border-amber-500/30 shadow-inner flex items-center justify-center text-amber-400 group-hover:border-amber-400 group-hover:scale-105 transition-all shrink-0 relative">
+              <Camera className="w-7 h-7 sm:w-9 sm:h-9 text-amber-300" />
+              {/* Glass Reflection Glow */}
+              <div className="absolute top-1 right-1 w-3 h-3 bg-amber-200/20 rounded-full blur-[1px]" />
+            </div>
+
+            {/* Label & Details */}
+            <div className="flex flex-col text-left">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="text-base sm:text-xl font-black uppercase tracking-wider text-[#faf6f0]">
+                  AMBIL FOTO
+                </span>
+                <span className="bg-rose-950/80 text-rose-400 border border-rose-600/50 text-[10px] sm:text-xs font-mono font-bold px-2.5 py-0.5 rounded-md tracking-widest flex items-center gap-1 shadow-inner">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                  ROLL READY
+                </span>
+              </div>
+              <span className="text-xs sm:text-sm text-[#d4c8b5] font-mono tracking-widest mt-1">
+                DIGITAL DISPOSABLE CAMERA
+              </span>
+            </div>
+          </div>
+
+          {/* Shutter Trigger Button Indicator */}
+          <div className="z-10 shrink-0 flex flex-col items-center gap-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500 text-[#1c1716] font-extrabold flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-amber-400 transition-all text-base sm:text-lg">
+              →
+            </div>
+            <span className="text-[8px] font-mono tracking-widest text-amber-400/80 uppercase">SHUTTER</span>
+          </div>
         </button>
 
         <div className="editorial-line-v" />
